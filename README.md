@@ -38,7 +38,6 @@ Los datos de solicitudes persisten localmente en el navegador mediante **Indexed
 ## ✨ Funcionalidades
 
 ### 🔍 Catálogo de animales
-- **18 animales** disponibles de diversas especies: perros, gatos, conejos, pájaros, tortugas, peces y más
 - Vista en **cuadrícula o lista** con toggle intercambiable
 - **Paginación** con 8 animales por página
 - **Búsqueda** en tiempo real por nombre o especie
