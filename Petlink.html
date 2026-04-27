@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Petlink</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --g50:#f0faf4;--g100:#d4f0df;--g200:#a8e0be;--g300:#72c89a;
+  --g400:#5bbf85;--g500:#3da86a;--g600:#2d8a55;--g700:#1e6b3f;
+  --n50:#f8f8f6;--n100:#f0efec;--n200:#e0dedb;--n300:#c8c6c2;
+  --n400:#a09e9a;--n500:#787572;--n700:#4a4845;--n900:#1a1917;
+  --sa:#2d8a55;--sa-bg:#d4f0df;--sr:#c07a10;--sr-bg:#fdecc8;
+  --su:#a32d2d;--su-bg:#f7c1c1;
+  --rsm:8px;--rmd:12px;--rlg:16px;
+  --font:'Nunito','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--n50);color:var(--n900);min-height:100vh}
+
+.db-bar{background:var(--g700);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:5px 1rem;letter-spacing:.3px}
+.db-bar span{opacity:.65;font-weight:400}
+.db-bar code{background:rgba(255,255,255,.15);padding:1px 5px;border-radius:3px;font-size:11px}
+
+.hdr{background:#fff;border-bottom:1px solid var(--n200);padding:0 2rem;position:sticky;top:0;z-index:200}
+.hdr-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;border:none;background:none;font-family:var(--font);cursor:pointer;padding:0}
+.logo-ic{width:36px;height:36px;background:var(--g500);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-tx{font-size:18px;font-weight:800;color:var(--g700);letter-spacing:-.3px}
+.logo-tx span{color:var(--n400);font-weight:400}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.hdr-stat{font-size:13px;color:var(--n500)}
+.hdr-stat strong{color:var(--g600);font-weight:700}
+.sol-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:var(--rsm);border:1.5px solid var(--n200);background:#fff;font-family:var(--font);font-size:13px;font-weight:700;color:var(--n700);cursor:pointer;transition:all .15s}
+.sol-btn:hover{background:var(--n100)}
+.sol-btn .badge{background:var(--g500);color:#fff;font-size:10px;font-weight:800;padding:1px 7px;border-radius:20px;min-width:18px;text-align:center}
+
+/* LOGIN BTN header */
+.login-btn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:var(--rsm);border:none;background:var(--g500);font-family:var(--font);font-size:13px;font-weight:800;color:#fff;cursor:pointer;transition:background .15s}
+.login-btn:hover{background:var(--g600)}
+.avatar-btn{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:40px;border:1.5px solid var(--g200);background:var(--g50);font-family:var(--font);font-size:13px;font-weight:700;color:var(--g700);cursor:pointer;transition:all .15s}
+.avatar-btn:hover{background:var(--g100);border-color:var(--g300)}
+.avatar-circle{width:30px;height:30px;border-radius:50%;background:var(--g500);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+
+/* LOGIN MODAL */
+.lmodal{background:#fff;border-radius:var(--rlg);width:100%;max-width:420px;overflow:hidden;animation:su .28s ease}
+.lmodal-tabs{display:flex;border-bottom:1px solid var(--n200)}
+.ltab{flex:1;padding:14px;border:none;background:transparent;font-family:var(--font);font-size:14px;font-weight:700;color:var(--n400);cursor:pointer;transition:all .15s;border-bottom:2.5px solid transparent;margin-bottom:-1px}
+.ltab.active{color:var(--g600);border-bottom-color:var(--g500)}
+.ltab:hover:not(.active){color:var(--n700);background:var(--n50)}
+.lbody{padding:1.75rem}
+.l-logo{text-align:center;margin-bottom:1.5rem}
+.l-logo-ic{width:52px;height:52px;background:var(--g500);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px}
+.l-title{font-size:20px;font-weight:900;color:var(--n900);margin-bottom:3px}
+.l-sub{font-size:13px;color:var(--n400)}
+.l-form{display:flex;flex-direction:column;gap:13px}
+.l-grp{display:flex;flex-direction:column;gap:5px}
+.l-label{font-size:12px;font-weight:700;color:var(--n500);text-transform:uppercase;letter-spacing:.6px}
+.l-input{width:100%;padding:11px 13px;border:1.5px solid var(--n200);border-radius:var(--rsm);font-family:var(--font);font-size:14px;color:var(--n900);background:#fff;outline:none;transition:border-color .15s}
+.l-input:focus{border-color:var(--g400)}
+.l-input::placeholder{color:var(--n300)}
+.l-pwd-wrap{position:relative}
+.l-pwd-wrap .l-input{padding-right:42px}
+.l-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--n400);padding:0;line-height:1}
+.l-forgot{font-size:12px;color:var(--g600);font-weight:700;text-align:right;cursor:pointer;background:none;border:none;font-family:var(--font);padding:0}
+.l-forgot:hover{text-decoration:underline}
+.l-divider{display:flex;align-items:center;gap:10px;color:var(--n300);font-size:12px;font-weight:600}
+.l-divider::before,.l-divider::after{content:'';flex:1;height:1px;background:var(--n200)}
+.l-social{display:flex;gap:10px}
+.l-social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border:1.5px solid var(--n200);border-radius:var(--rsm);background:#fff;font-family:var(--font);font-size:13px;font-weight:700;color:var(--n700);cursor:pointer;transition:all .15s}
+.l-social-btn:hover{background:var(--n50);border-color:var(--n300)}
+.l-submit{display:block;width:100%;padding:13px;border-radius:var(--rsm);border:none;background:var(--g500);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.l-submit:hover{background:var(--g600)}
+.l-terms{font-size:12px;color:var(--n400);line-height:1.6;text-align:center}
+.l-terms a{color:var(--g600);font-weight:700;text-decoration:none}
+.l-check-row{display:flex;align-items:flex-start;gap:9px;cursor:pointer}
+.l-check-row input{width:16px;height:16px;accent-color:var(--g500);cursor:pointer;margin-top:2px;flex-shrink:0}
+.l-check-label{font-size:13px;color:var(--n700);line-height:1.5}
+.l-check-label a{color:var(--g600);font-weight:700;text-decoration:none}
+
+/* User dropdown */
+.udrop-wrap{position:relative}
+.udrop{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--n200);border-radius:var(--rmd);min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.1);overflow:hidden;animation:fadeUp .18s ease;z-index:50}
+.udrop-head{padding:12px 14px;border-bottom:1px solid var(--n100);background:var(--g50)}
+.udrop-name{font-size:14px;font-weight:800;color:var(--g700)}
+.udrop-email{font-size:11px;color:var(--n400)}
+.udrop-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border:none;background:transparent;font-family:var(--font);font-size:13px;color:var(--n700);cursor:pointer;text-align:left;transition:background .12s}
+.udrop-item:hover{background:var(--n50)}
+.udrop-item.danger{color:var(--su)}
+.udrop-item.danger:hover{background:var(--su-bg)}
+
+.layout{max-width:1280px;margin:0 auto;padding:2rem;display:grid;grid-template-columns:260px 1fr;gap:2rem;align-items:start}
+
+.sidebar{background:#fff;border-radius:var(--rlg);border:1px solid var(--n200);padding:1.5rem;position:sticky;top:84px}
+.sb-title{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--n400);margin-bottom:1.25rem}
+.fg-s{margin-bottom:1.5rem}
+.fl{font-size:12px;font-weight:700;color:var(--n500);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:block}
+.fo{display:flex;flex-direction:column;gap:4px}
+.fb{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rsm);border:none;background:transparent;cursor:pointer;font-family:var(--font);font-size:13px;color:var(--n700);text-align:left;transition:background .15s,color .15s;width:100%}
+.fb:hover{background:var(--n100)}
+.fb.active{background:var(--g100);color:var(--g700);font-weight:700}
+.fb .dot{width:8px;height:8px;border-radius:50%;background:var(--n300);flex-shrink:0}
+.fb.active .dot{background:var(--g500)}
+.fc{margin-left:auto;font-size:11px;font-weight:700;color:var(--n400);background:var(--n100);padding:1px 6px;border-radius:20px}
+.fb.active .fc{background:var(--g200);color:var(--g700)}
+.rst-btn{display:block;width:100%;padding:9px;border-radius:var(--rsm);border:1px solid var(--n200);background:transparent;font-family:var(--font);font-size:13px;color:var(--n500);cursor:pointer;font-weight:600;transition:all .15s;margin-top:.5rem}
+.rst-btn:hover{background:var(--n100);color:var(--n700)}
+
+.main-area{min-width:0}
+.search-bar{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.sw{flex:1;position:relative}
+.sico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--n400);font-size:16px;pointer-events:none}
+.sinput{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--n200);border-radius:var(--rsm);font-family:var(--font);font-size:14px;color:var(--n900);background:#fff;transition:border-color .15s;outline:none}
+.sinput:focus{border-color:var(--g400)}
+.sinput::placeholder{color:var(--n400)}
+.ssel{padding:10px 14px;border:1.5px solid var(--n200);border-radius:var(--rsm);font-family:var(--font);font-size:13px;color:var(--n700);background:#fff;cursor:pointer;outline:none;min-width:150px}
+.rm{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.rc{font-size:13px;color:var(--n500)}
+.rc strong{color:var(--n900);font-weight:700}
+.vt{display:flex;gap:4px}
+.vb{width:34px;height:34px;border:1px solid var(--n200);border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;color:var(--n400)}
+.vb.active{background:var(--g100);color:var(--g700);border-color:var(--g200)}
+
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem;margin-bottom:2rem}
+.cl{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:var(--rmd);border:1px solid var(--n200);overflow:hidden;transition:transform .18s,box-shadow .18s;cursor:pointer;animation:fadeUp .3s ease both}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.cew{background:var(--g50);height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.csb{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.status-available{background:var(--sa-bg);color:var(--sa)}
+.status-review{background:var(--sr-bg);color:var(--sr)}
+.status-unavailable{background:var(--su-bg);color:var(--su)}
+.cb{padding:1rem}
+.cn{font-size:15px;font-weight:800;color:var(--n900);margin-bottom:2px}
+.csp{font-size:12px;color:var(--n400);margin-bottom:8px}
+.ct{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--n100);color:var(--n500)}
+.cft{display:flex;align-items:center;justify-content:space-between;padding:8px 1rem;border-top:1px solid var(--n100)}
+.ca{font-size:12px;color:var(--n500)}
+.ca strong{color:var(--n700);font-weight:700}
+.card-list{background:#fff;border-radius:var(--rsm);border:1px solid var(--n200);display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;transition:background .15s;animation:fadeUp .25s ease both;cursor:pointer}
+.card-list:hover{background:var(--n50)}
+.cle{font-size:32px;flex-shrink:0}
+.cli{flex:1;min-width:0}
+.cln{font-size:15px;font-weight:800;color:var(--n900)}
+.clm{font-size:12px;color:var(--n400)}
+.clr{display:flex;align-items:center;gap:12px}
+
+.lw{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem;gap:1rem}
+.spinner{width:36px;height:36px;border:3px solid var(--n200);border-top-color:var(--g500);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ew{text-align:center;padding:4rem 2rem;color:var(--n400)}
+.ei{font-size:48px;margin-bottom:1rem}
+
+.pg{display:flex;align-items:center;justify-content:center;gap:6px}
+.pb{min-width:36px;height:36px;padding:0 8px;border:1px solid var(--n200);border-radius:6px;background:#fff;font-family:var(--font);font-size:13px;font-weight:600;color:var(--n500);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pb:hover:not(:disabled){background:var(--n100);color:var(--n700)}
+.pb.active{background:var(--g500);color:#fff;border-color:var(--g500)}
+.pb:disabled{opacity:.35;cursor:not-allowed}
+
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fi .2s ease;overflow-y:auto}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* FICHA ANIMAL MODAL */
+.amodal{background:#fff;border-radius:var(--rlg);width:100%;max-width:540px;overflow:hidden;animation:su .25s ease;max-height:90vh;overflow-y:auto}
+.mhero{background:var(--g50);padding:2.5rem;text-align:center;position:relative}
+.mclose{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.85);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--n500);transition:background .15s}
+.mclose:hover{background:#fff}
+.mclose.static{position:static}
+.mbody{padding:1.5rem 1.75rem}
+.mname{font-size:24px;font-weight:900;margin-bottom:2px}
+.msub{font-size:13px;color:var(--n400);margin-bottom:1rem}
+.mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.ms{background:var(--n50);border-radius:var(--rsm);padding:10px 12px;text-align:center}
+.msl{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--n400);font-weight:700;margin-bottom:3px}
+.msv{font-size:15px;font-weight:800;color:var(--n900)}
+.mdesc{font-size:13px;color:var(--n500);line-height:1.75;margin-bottom:1.25rem}
+.madopt{display:block;width:100%;padding:13px;border-radius:var(--rsm);border:none;background:var(--g500);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.madopt:hover{background:var(--g600)}
+.madopt:disabled{background:var(--n200);color:var(--n400);cursor:not-allowed}
+
+/* FORMULARIO */
+.fmodal{background:#fff;border-radius:var(--rlg);width:100%;max-width:540px;overflow:hidden;animation:su .28s ease;max-height:95vh;overflow-y:auto}
+.fhdr{padding:1.5rem 1.75rem 0;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem}
+.ftitle{font-size:20px;font-weight:900;color:var(--n900);line-height:1.2}
+.fsub{font-size:12px;color:var(--n400);margin-top:3px}
+.fbody{padding:0 1.75rem 1.75rem;display:flex;flex-direction:column;gap:14px}
+.fpill{display:flex;align-items:center;gap:10px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--rsm);padding:10px 14px}
+.fpill-em{font-size:26px}
+.fpill-name{font-size:13px;font-weight:800;color:var(--g700)}
+.fpill-meta{font-size:11px;color:var(--g500)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrp{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:12px;font-weight:700;color:var(--n500);text-transform:uppercase;letter-spacing:.6px}
+.req{color:#e05050}
+.finput,.fselect,.ftextarea{width:100%;padding:10px 13px;border:1.5px solid var(--n200);border-radius:var(--rsm);font-family:var(--font);font-size:14px;color:var(--n900);background:#fff;outline:none;transition:border-color .15s}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--g400)}
+.finput.err,.fselect.err,.ftextarea.err{border-color:#e05050}
+.ferr{font-size:11px;color:#e05050;font-weight:700;margin-top:1px}
+.ftextarea{resize:vertical;min-height:84px;line-height:1.6}
+.fchk-row{display:flex;align-items:flex-start;gap:10px;background:var(--n50);padding:12px;border-radius:var(--rsm);border:1.5px solid var(--n200);cursor:pointer;transition:border-color .15s}
+.fchk-row:hover{border-color:var(--g300)}
+.fchk-row.err{border-color:#e05050}
+.fchk-row input[type=checkbox]{width:17px;height:17px;accent-color:var(--g500);cursor:pointer;flex-shrink:0;margin-top:1px}
+.fchk-label{font-size:13px;color:var(--n700);line-height:1.5;cursor:pointer}
+.fchk-label a{color:var(--g600);font-weight:700;text-decoration:none}
+.fbtns{display:flex;gap:10px}
+.fcancel{padding:13px 18px;border-radius:var(--rsm);border:1.5px solid var(--n200);background:#fff;font-family:var(--font);font-size:14px;font-weight:700;color:var(--n500);cursor:pointer;transition:all .15s;flex-shrink:0}
+.fcancel:hover{background:var(--n100);color:var(--n700)}
+.fsubmit{flex:1;padding:13px;border-radius:var(--rsm);border:none;background:var(--g500);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.fsubmit:hover:not(:disabled){background:var(--g600)}
+.fsubmit:disabled{opacity:.55;cursor:not-allowed}
+
+/* CONFIRMACIÓN */
+.cmodal{background:#fff;border-radius:var(--rlg);width:100%;max-width:440px;overflow:hidden;animation:su .28s ease;text-align:center}
+.cicon-wrap{background:var(--g50);padding:2.5rem 2rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:12px}
+.ccheck{width:72px;height:72px;border-radius:50%;background:var(--g500);display:flex;align-items:center;justify-content:center;font-size:34px;color:#fff;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.ctitle{font-size:22px;font-weight:900;color:var(--n900)}
+.cbody{padding:1.25rem 2rem 2rem}
+.ctext{font-size:14px;color:var(--n500);line-height:1.7;margin-bottom:1rem}
+.cref{display:inline-block;background:var(--g100);color:var(--g700);font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;letter-spacing:.5px;margin-bottom:1.25rem;font-family:monospace}
+.cinfo{background:var(--n50);border-radius:var(--rsm);padding:12px 14px;margin-bottom:1.5rem;text-align:left}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px}
+.crow:not(:last-child){border-bottom:1px solid var(--n200)}
+.ck{color:var(--n400);font-weight:600}
+.cv{color:var(--n900);font-weight:800}
+.cclose{display:block;width:100%;padding:13px;border-radius:var(--rsm);border:none;background:var(--g500);color:#fff;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.cclose:hover{background:var(--g600)}
+
+/* PANEL SOLICITUDES */
+.smodal{background:#fff;border-radius:var(--rlg);width:100%;max-width:720px;overflow:hidden;animation:su .25s ease;max-height:88vh;display:flex;flex-direction:column}
+.smod-hdr{padding:1.5rem 1.75rem;border-bottom:1px solid var(--n200);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.smod-title{font-size:17px;font-weight:900;color:var(--n900);display:flex;align-items:center;gap:8px}
+.smod-sub{font-size:12px;color:var(--n400);margin-top:2px}
+.smod-body{overflow-y:auto;flex:1;padding:1rem 1.75rem}
+.stab-hdr{display:grid;grid-template-columns:44px 1fr 100px 110px 110px;gap:10px;padding:0 10px 8px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--n400);border-bottom:1px solid var(--n200);margin-bottom:6px}
+.srow{display:grid;grid-template-columns:44px 1fr 100px 110px 110px;gap:10px;padding:10px;border-radius:var(--rsm);align-items:center;border:1px solid transparent;transition:background .15s;margin-bottom:3px}
+.srow:hover{background:var(--n50);border-color:var(--n200)}
+.srow-em{font-size:22px;text-align:center}
+.srow-name{font-size:14px;font-weight:800;color:var(--n900)}
+.srow-sol{font-size:12px;color:var(--n400)}
+.sbadge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;display:inline-block}
+.sbadge.pendiente{background:var(--sr-bg);color:var(--sr)}
+.sbadge.aprobada{background:var(--sa-bg);color:var(--sa)}
+.srow-date{font-size:12px;color:var(--n500);font-weight:600}
+.srow-ref{font-size:10px;color:var(--n300);font-family:monospace;font-weight:700}
+.sempty{text-align:center;padding:3rem;color:var(--n400)}
+.sempty-ic{font-size:40px;margin-bottom:.75rem}
+.smod-foot{padding:1rem 1.75rem;border-top:1px solid var(--n200);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:var(--n50)}
+.smod-count{font-size:13px;color:var(--n500)}
+.smod-count strong{color:var(--n900);font-weight:700}
+.sdel{padding:7px 14px;border-radius:var(--rsm);border:1.5px solid var(--su-bg);background:var(--su-bg);font-family:var(--font);font-size:12px;font-weight:700;color:var(--su);cursor:pointer;transition:all .15s}
+.sdel:hover{background:#f7c1c1;border-color:var(--su)}
+
+/* DB schema pill */
+.schema-bar{background:var(--n100);border-radius:var(--rsm);padding:10px 14px;margin-bottom:1rem;font-size:11px;color:var(--n500);font-family:monospace;line-height:1.8}
+.schema-bar strong{color:var(--g600)}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;padding:1rem}
+  .sidebar{position:static}
+  .cg{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .frow2{grid-template-columns:1fr}
+  .stab-hdr,.srow{grid-template-columns:36px 1fr 90px 90px}
+}
+</style>
+</head>
+<body>
+
+<div class="db-bar">
+  🗄️ Base de datos activa &nbsp;·&nbsp; <code>IndexedDB</code> &nbsp;·&nbsp; tabla <code>solicitudes</code>
+  <span> &nbsp;|&nbsp; Los datos se almacenan de forma persistente en tu navegador</span>
+</div>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+/* ═══════════════════════════════════════════════════════
+   BASE DE DATOS — IndexedDB
+   Objeto: solicitudes
+   Campos clave:
+     id (PK autoincrement)
+     id_animal            → FK al animal del catálogo
+     nombre_animal, especie, emoji
+     solicitante_nombre, solicitante_email,
+     solicitante_telefono, solicitante_ciudad,
+     vivienda, experiencia, motivo,
+     acepta_terminos (boolean)
+     estado               → 'pendiente' | 'aprobada' | 'rechazada'
+     fecha (ISO string)
+     referencia           → código único SOL-XXXXXX
+═══════════════════════════════════════════════════════ */
+
+const DB_NAME  = 'adoptahub_v1';
+const DB_VER   = 1;
+const STORE    = 'solicitudes';
+
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        const st = db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+        st.createIndex('id_animal', 'id_animal', { unique: false });
+        st.createIndex('estado',    'estado',    { unique: false });
+        st.createIndex('fecha',     'fecha',     { unique: false });
+      }
+    };
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function dbInsert(rec) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const r  = tx.objectStore(STORE).add(rec);
+    r.onsuccess = e => res(e.target.result);
+    r.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function dbGetAll() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const r  = tx.objectStore(STORE).getAll();
+    r.onsuccess = e => res(e.target.result);
+    r.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function dbClear() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).clear().onsuccess = () => res();
+    tx.onerror = e => rej(e.target.error);
+  });
+}
+
+const genRef = () => 'SOL-' + Date.now().toString(36).toUpperCase().slice(-6);
+
+/* ── DATOS ── */
+const ANIMALS = [
+  { id:1,  name:"Luna",  species:"Perro",   breed:"Labrador",        size:"Grande",  age:3,  status:"available",   emoji:"🐕",    description:"Luna es una perra alegre y cariñosa que adora jugar al aire libre. Está vacunada y esterilizada." },
+  { id:2,  name:"Mochi", species:"Gato",    breed:"Persa",           size:"Pequeño", age:2,  status:"available",   emoji:"🐈",    description:"Mochi es un gato tranquilo y afectuoso. Perfecto para hogares tranquilos." },
+  { id:3,  name:"Tito",  species:"Conejo",  breed:"Enano",           size:"Pequeño", age:1,  status:"review",      emoji:"🐇",    description:"Tito es un conejo curioso y activo. Necesita espacio para explorar y compañía." },
+  { id:4,  name:"Rex",   species:"Perro",   breed:"Pastor Alemán",   size:"Grande",  age:5,  status:"available",   emoji:"🐕‍🦺", description:"Rex es un perro leal e inteligente. Tiene experiencia con familias y niños." },
+  { id:5,  name:"Nala",  species:"Gato",    breed:"Siamés",          size:"Mediano", age:4,  status:"unavailable", emoji:"🐱",    description:"Nala está temporalmente no disponible. Está en proceso de recuperación veterinaria." },
+  { id:6,  name:"Pipo",  species:"Pájaro",  breed:"Periquito",       size:"Pequeño", age:1,  status:"available",   emoji:"🦜",    description:"Pipo es un periquito social que aprende a hablar. Ideal para hogares activos." },
+  { id:7,  name:"Bruno", species:"Perro",   breed:"Bulldog",         size:"Mediano", age:6,  status:"review",      emoji:"🐶",    description:"Bruno está siendo evaluado por nuestro equipo veterinario antes de la adopción." },
+  { id:8,  name:"Cleo",  species:"Gato",    breed:"Bengalí",         size:"Mediano", age:2,  status:"available",   emoji:"🐈‍⬛", description:"Cleo es una gata activa y juguetona. Le encanta escalar." },
+  { id:9,  name:"Gordo", species:"Hamster", breed:"Sirio",           size:"Pequeño", age:1,  status:"available",   emoji:"🐹",    description:"Gordo es un hámster nocturno y curioso. Perfecto para apartamentos pequeños." },
+  { id:10, name:"Ariel", species:"Pez",     breed:"Betta",           size:"Pequeño", age:1,  status:"available",   emoji:"🐠",    description:"Ariel es un pez betta de colores vibrantes. Necesita acuario individual." },
+  { id:11, name:"Max",   species:"Perro",   breed:"Golden Retriever",size:"Grande",  age:2,  status:"available",   emoji:"🦮",    description:"Max es un golden energético que ama el agua y los juegos. Excelente con niños." },
+  { id:12, name:"Kira",  species:"Gato",    breed:"Angora",          size:"Mediano", age:3,  status:"review",      emoji:"🐾",    description:"Kira está en revisión para verificar su compatibilidad con otros animales." },
+  { id:13, name:"Pepe",  species:"Tortuga", breed:"Mediterránea",    size:"Pequeño", age:10, status:"available",   emoji:"🐢",    description:"Pepe es una tortuga longeva y tranquila. Perfecta para dueños primerizos." },
+  { id:14, name:"Lola",  species:"Perro",   breed:"Chihuahua",       size:"Pequeño", age:4,  status:"available",   emoji:"🐕",    description:"Lola es pequeña pero con mucha personalidad. Fiel compañera para personas mayores." },
+  { id:15, name:"Zeus",  species:"Perro",   breed:"Rottweiler",      size:"Grande",  age:7,  status:"unavailable", emoji:"🐕‍🦺", description:"Zeus está reservado y pendiente de trámites de adopción." },
+  { id:16, name:"Mia",   species:"Gato",    breed:"Europeo",         size:"Mediano", age:1,  status:"available",   emoji:"🐱",    description:"Mia es una gatita joven y juguetona recién rescatada. Llena de energía." },
+  { id:17, name:"Río",   species:"Pájaro",  breed:"Canario",         size:"Pequeño", age:2,  status:"available",   emoji:"🐦",    description:"Río canta melodiosamente cada mañana. Aporta alegría a cualquier hogar." },
+  { id:18, name:"Tarta", species:"Tortuga", breed:"Acuática",        size:"Pequeño", age:5,  status:"review",      emoji:"🐢",    description:"Tarta está siendo evaluada para garantizar condiciones óptimas de acogida." },
+];
+
+const SPECIES = ["Todos","Perro","Gato","Pájaro","Conejo","Hamster","Tortuga","Pez"];
+const SIZES   = ["Todos","Pequeño","Mediano","Grande"];
+const AGES    = [
+  { label:"Todos",             min:0, max:99 },
+  { label:"Cachorro (0-1 año)",min:0, max:1  },
+  { label:"Joven (2-3 años)",  min:2, max:3  },
+  { label:"Adulto (4-7 años)", min:4, max:7  },
+  { label:"Senior (+7 años)",  min:8, max:99 },
+];
+const STATS_LIST = [
+  { key:"all",         label:"Todos",         dot:"var(--n300)" },
+  { key:"available",   label:"Disponible",    dot:"var(--sa)"   },
+  { key:"review",      label:"En revisión",   dot:"var(--sr)"   },
+  { key:"unavailable", label:"No disponible", dot:"var(--su)"   },
+];
+const SL = { available:"Disponible", review:"En revisión", unavailable:"No disponible" };
+const PER = 8;
+
+/* ── helpers ── */
+const req  = v => (!v || !String(v).trim()) ? "Campo obligatorio" : "";
+const mail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||"") ? "" : "Email no válido";
+const tel  = v => /^\+?[\d\s\-]{7,15}$/.test(v||"") ? "" : "Teléfono no válido";
+
+function SBadge({ status, style }) {
+  return <span className={`csb status-${status}`} style={style}>{SL[status]}</span>;
+}
+
+/* ════════════ CARD ════════════ */
+function Card({ a, view, onClick }) {
+  const s = { animationDelay:`${Math.random()*.12}s` };
+  if (view === "list") return (
+    <div className="card-list" style={s} onClick={()=>onClick(a)}>
+      <div className="cle">{a.emoji}</div>
+      <div className="cli">
+        <div className="cln">{a.name}</div>
+        <div className="clm">{a.species} · {a.breed} · {a.size}</div>
+      </div>
+      <div className="clr">
+        <span className="tag">{a.age} {a.age===1?"año":"años"}</span>
+        <SBadge status={a.status}/>
+      </div>
+    </div>
+  );
+  return (
+    <div className="card" style={s} onClick={()=>onClick(a)}>
+      <div className="cew">{a.emoji}<SBadge status={a.status}/></div>
+      <div className="cb">
+        <div className="cn">{a.name}</div>
+        <div className="csp">{a.species} · {a.breed}</div>
+        <div className="ct"><span className="tag">{a.size}</span></div>
+      </div>
+      <div className="cft">
+        <span className="ca"><strong>{a.age}</strong> {a.age===1?"año":"años"}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ FICHA ANIMAL ════════════ */
+function AnimalModal({ a, onClose, onAdopt }) {
+  const can = a.status === "available";
+  return (
+    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="amodal">
+        <div className="mhero">
+          <div style={{fontSize:80,lineHeight:1}}>{a.emoji}</div>
+          <button className="mclose" onClick={onClose}>✕</button>
+        </div>
+        <div className="mbody">
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:"1rem"}}>
+            <div>
+              <div className="mname">{a.name}</div>
+              <div className="msub">{a.species} · {a.breed}</div>
+            </div>
+            <SBadge status={a.status}/>
+          </div>
+          <div className="mstats">
+            <div className="ms"><div className="msl">Tamaño</div><div className="msv">{a.size}</div></div>
+            <div className="ms"><div className="msl">Edad</div><div className="msv">{a.age} {a.age===1?"año":"años"}</div></div>
+            <div className="ms"><div className="msl">Especie</div><div className="msv">{a.species}</div></div>
+          </div>
+          <p className="mdesc">{a.description}</p>
+          <button
+            className="madopt"
+            disabled={!can}
+            onClick={()=>can&&onAdopt(a)}
+          >
+            {can ? "🐾 Solicitar adopción" : a.status==="review" ? "⏳ En proceso de revisión" : "🔒 No disponible"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ FORMULARIO ════════════ */
+const VIVIENDA    = ["Piso sin terraza","Piso con terraza","Casa con jardín","Casa de campo"];
+const EXPERIENCIA = ["Primera vez","He tenido mascotas","Tengo mascotas actualmente","Trabajo con animales"];
+
+function FormModal({ a, onClose, onSuccess }) {
+  const empty = { nombre:"", email:"", telefono:"", ciudad:"", vivienda:"", experiencia:"", motivo:"", terminos:false };
+  const [f, setF]       = useState(empty);
+  const [errs, setErrs] = useState({});
+  const [busy, setBusy] = useState(false);
+
+  const set = (k, v) => { setF(p=>({...p,[k]:v})); setErrs(p=>({...p,[k]:""})); };
+
+  const validate = () => {
+    const e = {
+      nombre:      req(f.nombre),
+      email:       mail(f.email),
+      telefono:    tel(f.telefono),
+      ciudad:      req(f.ciudad),
+      vivienda:    f.vivienda    ? "" : "Selecciona una opción",
+      experiencia: f.experiencia ? "" : "Selecciona una opción",
+      motivo:      f.motivo.trim().length >= 20 ? "" : "Mínimo 20 caracteres",
+      terminos:    f.terminos    ? "" : "Debes aceptar los términos",
+    };
+    setErrs(e);
+    return Object.values(e).every(v=>!v);
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
+    setBusy(true);
+    try {
+      const ref  = genRef();
+      const now  = new Date().toISOString();
+      /* ── INSERT en tabla `solicitudes` ── */
+      const record = {
+        id_animal:            a.id,
+        nombre_animal:        a.name,
+        especie:              a.species,
+        emoji:                a.emoji,
+        solicitante_nombre:   f.nombre.trim(),
+        solicitante_email:    f.email.trim().toLowerCase(),
+        solicitante_telefono: f.telefono.trim(),
+        solicitante_ciudad:   f.ciudad.trim(),
+        vivienda:             f.vivienda,
+        experiencia:          f.experiencia,
+        motivo:               f.motivo.trim(),
+        acepta_terminos:      true,
+        estado:               "pendiente",
+        fecha:                now,
+        referencia:           ref,
+      };
+      const newId = await dbInsert(record);
+      await new Promise(r=>setTimeout(r,650)); // UX: mini delay
+      onSuccess({ ...record, id: newId });
+    } catch(err) {
+      alert("Error al guardar en la base de datos: " + err.message);
+      setBusy(false);
+    }
+  };
+
+  const Field = ({ k, label, isReq, ...props }) => (
+    <div className="fgrp">
+      <label className="flabel">{label}{isReq&&<span className="req"> *</span>}</label>
+      <input className={`finput${errs[k]?" err":""}`} value={f[k]} onChange={e=>set(k,e.target.value)} {...props}/>
+      {errs[k]&&<span className="ferr">⚠ {errs[k]}</span>}
+    </div>
+  );
+  const Sel = ({ k, label, opts }) => (
+    <div className="fgrp">
+      <label className="flabel">{label} <span className="req">*</span></label>
+      <select className={`fselect${errs[k]?" err":""}`} value={f[k]} onChange={e=>set(k,e.target.value)}>
+        <option value="">Seleccionar…</option>
+        {opts.map(o=><option key={o}>{o}</option>)}
+      </select>
+      {errs[k]&&<span className="ferr">⚠ {errs[k]}</span>}
+    </div>
+  );
+
+  return (
+    <div className="overlay" onClick={e=>e.target===e.currentTarget&&!busy&&onClose()}>
+      <div className="fmodal">
+        <div className="fhdr">
+          <div>
+            <div className="ftitle">Solicitud de adopción</div>
+            <div className="fsub">Rellena el formulario · revisaremos tu solicitud en 48 h</div>
+          </div>
+          {!busy&&<button className="mclose static" onClick={onClose}>✕</button>}
+        </div>
+        <div className="fbody">
+
+          {/* Animal pill */}
+          <div className="fpill">
+            <div className="fpill-em">{a.emoji}</div>
+            <div style={{flex:1}}>
+              <div className="fpill-name">{a.name}</div>
+              <div className="fpill-meta">{a.species} · {a.breed} · {a.size}</div>
+            </div>
+            <SBadge status={a.status} style={{marginLeft:"auto"}}/>
+          </div>
+
+          {/* Datos personales */}
+          <div className="frow2">
+            <Field k="nombre" label="Nombre completo" isReq placeholder="María García López"/>
+            <Field k="ciudad" label="Ciudad"          isReq placeholder="Valencia"/>
+          </div>
+          <div className="frow2">
+            <Field k="email"    label="Email"    isReq type="email" placeholder="tu@email.com"/>
+            <Field k="telefono" label="Teléfono" isReq placeholder="+34 600 000 000"/>
+          </div>
+          <div className="frow2">
+            <Sel k="vivienda"    label="Tipo de vivienda" opts={VIVIENDA}/>
+            <Sel k="experiencia" label="Experiencia"      opts={EXPERIENCIA}/>
+          </div>
+
+          {/* Motivo */}
+          <div className="fgrp">
+            <label className="flabel">¿Por qué quieres adoptar a {a.name}? <span className="req">*</span></label>
+            <textarea
+              className={`ftextarea${errs.motivo?" err":""}`}
+              placeholder={`Cuéntanos por qué sería el hogar ideal para ${a.name}… (mínimo 20 caracteres)`}
+              value={f.motivo}
+              onChange={e=>set("motivo",e.target.value)}
+            />
+            <span style={{fontSize:11,textAlign:"right",fontWeight:700,color:f.motivo.length>=20?"var(--sa)":"var(--n400)"}}>
+              {f.motivo.length} / 20 mín.
+            </span>
+            {errs.motivo&&<span className="ferr">⚠ {errs.motivo}</span>}
+          </div>
+
+          {/* Términos */}
+          <div className={`fchk-row${errs.terminos?" err":""}`} onClick={()=>set("terminos",!f.terminos)}>
+            <input type="checkbox" checked={f.terminos} readOnly/>
+            <span className="fchk-label">
+              Acepto los <a href="#" onClick={e=>e.preventDefault()}>términos y condiciones</a> y la{" "}
+              <a href="#" onClick={e=>e.preventDefault()}>política de privacidad</a> de AdoptaHub <span className="req">*</span>
+            </span>
+          </div>
+          {errs.terminos&&<span className="ferr">⚠ {errs.terminos}</span>}
+
+          {/* Botones */}
+          <div className="fbtns">
+            <button className="fcancel" onClick={onClose} disabled={busy}>Cancelar</button>
+            <button className="fsubmit" onClick={submit}  disabled={busy}>
+              {busy ? "⏳ Guardando en la base de datos…" : "✅ Enviar solicitud de adopción"}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ CONFIRMACIÓN ════════════ */
+function ConfirmModal({ rec, onClose }) {
+  const fecha = new Date(rec.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const hora  = new Date(rec.fecha).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  return (
+    <div className="overlay">
+      <div className="cmodal">
+        <div className="cicon-wrap">
+          <div className="ccheck">✓</div>
+          <div className="ctitle">¡Solicitud registrada!</div>
+        </div>
+        <div className="cbody">
+          <p className="ctext">
+            La solicitud para adoptar a <strong>{rec.nombre_animal}</strong> ha sido
+            guardada correctamente en la tabla <code style={{background:"var(--n100)",padding:"1px 5px",borderRadius:3,fontSize:12}}>solicitudes</code>.
+            Te contactaremos en un máximo de <strong>48 horas</strong>.
+          </p>
+          <div className="cref">{rec.referencia}</div>
+          <div className="cinfo">
+            <div className="crow"><span className="ck">Animal</span><span className="cv">{rec.emoji} {rec.nombre_animal}</span></div>
+            <div className="crow"><span className="ck">id_animal</span><span className="cv" style={{fontFamily:"monospace"}}>#{rec.id_animal}</span></div>
+            <div className="crow"><span className="ck">Solicitante</span><span className="cv">{rec.solicitante_nombre}</span></div>
+            <div className="crow"><span className="ck">Email</span><span className="cv" style={{fontSize:12}}>{rec.solicitante_email}</span></div>
+            <div className="crow"><span className="ck">Fecha</span><span className="cv">{fecha} · {hora}</span></div>
+            <div className="crow"><span className="ck">Estado</span><span className="cv" style={{color:"var(--sr)"}}>⏳ Pendiente</span></div>
+            <div className="crow"><span className="ck">ID registro</span><span className="cv" style={{fontFamily:"monospace"}}>#{rec.id}</span></div>
+          </div>
+          <button className="cclose" onClick={onClose}>Volver al catálogo</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ PANEL SOLICITUDES DB ════════════ */
+function SolicitudesPanel({ onClose, tick }) {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    dbGetAll().then(d=>{
+      setRows(d.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)));
+      setLoading(false);
+    });
+  },[tick]);
+
+  const clear = async () => {
+    if (!confirm("¿Borrar todos los registros de la tabla solicitudes?")) return;
+    await dbClear();
+    setRows([]);
+  };
+
+  return (
+    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="smodal">
+        <div className="smod-hdr">
+          <div>
+            <div className="smod-title">
+              🗄️ Tabla <code style={{background:"var(--n100)",padding:"1px 8px",borderRadius:4,fontSize:13,fontWeight:700}}>solicitudes</code>
+            </div>
+            <div className="smod-sub">IndexedDB · {DB_NAME} · registros persistentes en el navegador</div>
+          </div>
+          <button className="mclose static" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="smod-body">
+          {/* Schema de la tabla */}
+          <div className="schema-bar">
+            <strong>CREATE TABLE solicitudes</strong> ( id INTEGER PRIMARY KEY AUTOINCREMENT,
+            <strong> id_animal</strong> INTEGER, nombre_animal TEXT, especie TEXT, emoji TEXT,
+            solicitante_nombre TEXT, solicitante_email TEXT, solicitante_ciudad TEXT,
+            vivienda TEXT, experiencia TEXT, motivo TEXT, acepta_terminos BOOLEAN,
+            <strong> estado</strong> TEXT DEFAULT 'pendiente',
+            <strong> fecha</strong> TEXT, <strong>referencia</strong> TEXT )
+          </div>
+
+          {loading ? (
+            <div className="lw"><div className="spinner"/></div>
+          ) : rows.length === 0 ? (
+            <div className="sempty">
+              <div className="sempty-ic">📭</div>
+              <div style={{fontSize:14}}>La tabla está vacía.<br/>Envía una solicitud desde el catálogo para ver el registro aquí.</div>
+            </div>
+          ) : (
+            <>
+              <div className="stab-hdr">
+                <span>Animal</span>
+                <span>Solicitante · Ciudad</span>
+                <span>Vivienda</span>
+                <span>Estado</span>
+                <span>Fecha · Referencia</span>
+              </div>
+              {rows.map(r => {
+                const d = new Date(r.fecha);
+                const fecha = d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
+                const hora  = d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+                return (
+                  <div className="srow" key={r.id}>
+                    <div className="srow-em" title={`id_animal: ${r.id_animal}`}>{r.emoji}</div>
+                    <div>
+                      <div className="srow-name">{r.nombre_animal}</div>
+                      <div className="srow-sol">{r.solicitante_nombre} · {r.solicitante_ciudad}</div>
+                    </div>
+                    <div style={{fontSize:12,color:"var(--n500)"}}>{r.vivienda}</div>
+                    <div>
+                      <span className={`sbadge ${r.estado}`}>
+                        {r.estado==="pendiente"?"⏳ Pendiente":"✓ Aprobada"}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="srow-date">{fecha} {hora}</div>
+                      <div className="srow-ref">{r.referencia}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+
+        <div className="smod-foot">
+          <div className="smod-count"><strong>{rows.length}</strong> registro{rows.length!==1?"s":""} en la base de datos</div>
+          {rows.length>0 && <button className="sdel" onClick={clear}>🗑 Limpiar tabla</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ SIDEBAR FILTROS ════════════ */
+function Sidebar({ filters, setFilters, counts }) {
+  const reset = () => setFilters({ species:"Todos", size:"Todos", age:0, status:"all", search:"" });
+  const hasF  = filters.species!=="Todos"||filters.size!=="Todos"||filters.age!==0||filters.status!=="all"||filters.search!=="";
+  const spc   = useMemo(()=>{ const c={}; ANIMALS.forEach(a=>{ c[a.species]=(c[a.species]||0)+1; }); return c; },[]);
+  return (
+    <aside className="sidebar">
+      <div className="sb-title">Filtros</div>
+      {[
+        { label:"Especie", key:"species", opts:SPECIES, withCount:true },
+        { label:"Tamaño",  key:"size",    opts:SIZES },
+      ].map(({label,key,opts,withCount}) => (
+        <div className="fg-s" key={key}>
+          <span className="fl">{label}</span>
+          <div className="fo">
+            {opts.map(o=>(
+              <button key={o} className={`fb ${filters[key]===o?"active":""}`} onClick={()=>setFilters(f=>({...f,[key]:o}))}>
+                <span className="dot"/>{o}
+                {withCount && o!=="Todos" && <span className="fc">{spc[o]||0}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div className="fg-s">
+        <span className="fl">Edad</span>
+        <div className="fo">
+          {AGES.map((r,i)=>(
+            <button key={i} className={`fb ${filters.age===i?"active":""}`} onClick={()=>setFilters(f=>({...f,age:i}))}>
+              <span className="dot"/>{r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="fg-s">
+        <span className="fl">Estado</span>
+        <div className="fo">
+          {STATS_LIST.map(s=>(
+            <button key={s.key} className={`fb ${filters.status===s.key?"active":""}`} onClick={()=>setFilters(f=>({...f,status:s.key}))}>
+              <span className="dot" style={{background:s.dot}}/>{s.label}
+              {s.key!=="all"&&<span className="fc">{counts[s.key]||0}</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+      {hasF&&<button className="rst-btn" onClick={reset}>✕ Limpiar filtros</button>}
+    </aside>
+  );
+}
+
+/* ════════════ LOGIN MODAL ════════════ */
+function LoginModal({ onClose, onLogin }) {
+  const [tab, setTab]           = useState("login");
+  const [showPwd, setShowPwd]   = useState(false);
+  const [showPwd2, setShowPwd2] = useState(false);
+  const [regCheck, setRegCheck] = useState(false);
+  const [lf, setLf] = useState({ email:"", pwd:"" });
+  const [rf, setRf] = useState({ nombre:"", email:"", pwd:"", pwd2:"" });
+
+  /* Demo visual: simula sesión con los datos introducidos — sin backend real */
+  const handleLogin = () => {
+    const nombre = lf.email ? lf.email.split("@")[0] : "Usuario";
+    const cap    = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    onLogin(cap, lf.email || "usuario@adoptahub.es");
+  };
+  const handleRegister = () => {
+    onLogin(rf.nombre || "Nuevo Usuario", rf.email || "usuario@adoptahub.es");
+  };
+
+  return (
+    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="lmodal">
+        {/* Tabs */}
+        <div className="lmodal-tabs">
+          <button className={`ltab ${tab==="login"?"active":""}`}    onClick={()=>setTab("login")}>Iniciar sesión</button>
+          <button className={`ltab ${tab==="register"?"active":""}`} onClick={()=>setTab("register")}>Crear cuenta</button>
+        </div>
+
+        <div className="lbody">
+          {/* Logo + título */}
+          <div className="l-logo">
+            <div className="l-logo-ic">🐾</div>
+            <div className="l-title">{tab==="login" ? "Bienvenido de nuevo" : "Únete a AdoptaHub"}</div>
+            <div className="l-sub">{tab==="login" ? "Accede a tu cuenta para gestionar solicitudes" : "Crea tu cuenta gratuita en segundos"}</div>
+          </div>
+
+          {/* ── LOGIN ── */}
+          {tab === "login" && (
+            <div className="l-form">
+              {/* Social */}
+              <div className="l-social">
+                <button className="l-social-btn">
+                  <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                  Continuar con Google
+                </button>
+                <button className="l-social-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+                  Continuar con Facebook
+                </button>
+              </div>
+              <div className="l-divider">o con tu email</div>
+
+              <div className="l-grp">
+                <label className="l-label">Email</label>
+                <input className="l-input" type="email" placeholder="tu@email.com"
+                  value={lf.email} onChange={e=>setLf(p=>({...p,email:e.target.value}))}/>
+              </div>
+              <div className="l-grp">
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <label className="l-label">Contraseña</label>
+                  <button className="l-forgot" onClick={e=>e.preventDefault()}>¿Olvidaste tu contraseña?</button>
+                </div>
+                <div className="l-pwd-wrap">
+                  <input className="l-input" type={showPwd?"text":"password"} placeholder="••••••••"
+                    value={lf.pwd} onChange={e=>setLf(p=>({...p,pwd:e.target.value}))}/>
+                  <button className="l-eye" onClick={()=>setShowPwd(v=>!v)}>{showPwd?"🙈":"👁️"}</button>
+                </div>
+              </div>
+
+              <button className="l-submit" onClick={handleLogin}>Iniciar sesión →</button>
+              <p className="l-terms">
+                ¿No tienes cuenta?{" "}
+                <a href="#" onClick={e=>{e.preventDefault();setTab("register")}}>Regístrate gratis</a>
+              </p>
+            </div>
+          )}
+
+          {/* ── REGISTRO ── */}
+          {tab === "register" && (
+            <div className="l-form">
+              <div className="l-grp">
+                <label className="l-label">Nombre completo</label>
+                <input className="l-input" type="text" placeholder="María García"
+                  value={rf.nombre} onChange={e=>setRf(p=>({...p,nombre:e.target.value}))}/>
+              </div>
+              <div className="l-grp">
+                <label className="l-label">Email</label>
+                <input className="l-input" type="email" placeholder="tu@email.com"
+                  value={rf.email} onChange={e=>setRf(p=>({...p,email:e.target.value}))}/>
+              </div>
+              <div className="l-grp">
+                <label className="l-label">Contraseña</label>
+                <div className="l-pwd-wrap">
+                  <input className="l-input" type={showPwd?"text":"password"} placeholder="Mín. 8 caracteres"
+                    value={rf.pwd} onChange={e=>setRf(p=>({...p,pwd:e.target.value}))}/>
+                  <button className="l-eye" onClick={()=>setShowPwd(v=>!v)}>{showPwd?"🙈":"👁️"}</button>
+                </div>
+                {/* strength bar */}
+                {rf.pwd.length>0 && (
+                  <div style={{display:"flex",gap:4,marginTop:5}}>
+                    {[1,2,3,4].map(i=>(
+                      <div key={i} style={{flex:1,height:3,borderRadius:4,background:rf.pwd.length>=i*3?(i<=1?"#e25050":i<=2?"var(--sr)":i<=3?"var(--g400)":"var(--g500)"):"var(--n200)",transition:"background .2s"}}/>
+                    ))}
+                    <span style={{fontSize:10,color:"var(--n400)",fontWeight:700,whiteSpace:"nowrap"}}>
+                      {rf.pwd.length<4?"Débil":rf.pwd.length<7?"Regular":rf.pwd.length<10?"Buena":"Fuerte"}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="l-grp">
+                <label className="l-label">Repetir contraseña</label>
+                <div className="l-pwd-wrap">
+                  <input className="l-input" type={showPwd2?"text":"password"} placeholder="••••••••"
+                    value={rf.pwd2} onChange={e=>setRf(p=>({...p,pwd2:e.target.value}))}/>
+                  <button className="l-eye" onClick={()=>setShowPwd2(v=>!v)}>{showPwd2?"🙈":"👁️"}</button>
+                </div>
+                {rf.pwd2 && rf.pwd !== rf.pwd2 && (
+                  <span style={{fontSize:11,color:"#e25050",fontWeight:700}}>⚠ Las contraseñas no coinciden</span>
+                )}
+              </div>
+
+              <div className="l-check-row" onClick={()=>setRegCheck(v=>!v)}>
+                <input type="checkbox" checked={regCheck} readOnly/>
+                <span className="l-check-label">
+                  Acepto los <a href="#" onClick={e=>e.preventDefault()}>términos de uso</a> y la{" "}
+                  <a href="#" onClick={e=>e.preventDefault()}>política de privacidad</a>
+                </span>
+              </div>
+
+              <button className="l-submit" onClick={handleRegister}>Crear cuenta gratis →</button>
+              <p className="l-terms">
+                ¿Ya tienes cuenta?{" "}
+                <a href="#" onClick={e=>{e.preventDefault();setTab("login")}}>Inicia sesión</a>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════ APP ════════════ */
+function App() {
+  const [filters, setFilters] = useState({ species:"Todos", size:"Todos", age:0, status:"all", search:"" });
+  const [page, setPage]       = useState(1);
+  const [view, setView]       = useState("grid");
+  const [aModal, setAModal]     = useState(null);
+  const [fModal, setFModal]     = useState(null);
+  const [confirm, setConfirm]   = useState(null);
+  const [showDB, setShowDB]     = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  // user = null (anónimo) | { nombre, email, initials } (visual, no conectado a backend)
+  const [user, setUser]         = useState(null);
+  const [showDrop, setShowDrop] = useState(false);
+  const [solCount, setSolCount] = useState(0);
+  const [tick, setTick]         = useState(0);
+  const [filtering, setFiltering] = useState(false);
+
+  useEffect(()=>{ dbGetAll().then(d=>setSolCount(d.length)); },[tick]);
+
+  // Cerrar dropdown al click fuera
+  useEffect(()=>{
+    if (!showDrop) return;
+    const h = () => setShowDrop(false);
+    setTimeout(()=>document.addEventListener("click", h), 0);
+    return ()=>document.removeEventListener("click", h);
+  },[showDrop]);
+
+  const sCounts = useMemo(()=>{ const c={}; ANIMALS.forEach(a=>{ c[a.status]=(c[a.status]||0)+1; }); return c; },[]);
+
+  const filtered = useMemo(()=>{
+    const ar = AGES[filters.age];
+    return ANIMALS.filter(a=>{
+      if (filters.species!=="Todos" && a.species!==filters.species) return false;
+      if (filters.size!=="Todos"    && a.size!==filters.size)       return false;
+      if (a.age<ar.min || a.age>ar.max)                             return false;
+      if (filters.status!=="all"   && a.status!==filters.status)    return false;
+      if (filters.search && !a.name.toLowerCase().includes(filters.search.toLowerCase())
+                         && !a.species.toLowerCase().includes(filters.search.toLowerCase())) return false;
+      return true;
+    });
+  },[filters]);
+
+  useEffect(()=>{
+    setFiltering(true); setPage(1);
+    const t=setTimeout(()=>setFiltering(false),350);
+    return()=>clearTimeout(t);
+  },[filters]);
+
+  const paged = filtered.slice((page-1)*PER, page*PER);
+
+  const onAdopt = a => { setAModal(null); setFModal(a); };
+  const onSuccess = rec => { setFModal(null); setConfirm(rec); setTick(t=>t+1); };
+  const onConfirmClose = () => setConfirm(null);
+
+  /* login visual — simula sesión sin backend */
+  const handleFakeLogin = (nombre, email) => {
+    const initials = nombre.split(" ").slice(0,2).map(w=>w[0].toUpperCase()).join("");
+    setUser({ nombre, email, initials });
+    setShowLogin(false);
+  };
+
+  return (
+    <>
+      <header className="hdr">
+        <div className="hdr-in">
+          <button className="logo"><div className="logo-ic">🐾</div><span className="logo-tx">Adopta<span>Hub</span></span></button>
+          <div className="hdr-right">
+            <div className="hdr-stat"><strong>{ANIMALS.filter(a=>a.status==="available").length}</strong> animales disponibles</div>
+            <button className="sol-btn" onClick={()=>setShowDB(true)}>
+              🗄️ Ver solicitudes{solCount>0&&<span className="badge">{solCount}</span>}
+            </button>
+            {/* LOGIN / AVATAR */}
+            {!user ? (
+              <button className="login-btn" onClick={()=>setShowLogin(true)}>
+                🔑 Iniciar sesión
+              </button>
+            ) : (
+              <div className="udrop-wrap">
+                <button className="avatar-btn" onClick={e=>{e.stopPropagation();setShowDrop(v=>!v)}}>
+                  <div className="avatar-circle">{user.initials}</div>
+                  {user.nombre.split(" ")[0]}
+                  <span style={{fontSize:10,color:"var(--n400)"}}>▾</span>
+                </button>
+                {showDrop && (
+                  <div className="udrop" onClick={e=>e.stopPropagation()}>
+                    <div className="udrop-head">
+                      <div className="udrop-name">{user.nombre}</div>
+                      <div className="udrop-email">{user.email}</div>
+                    </div>
+                    <button className="udrop-item">👤 Mi perfil</button>
+                    <button className="udrop-item">📋 Mis solicitudes</button>
+                    <button className="udrop-item">❤️ Favoritos</button>
+                    <button className="udrop-item">⚙️ Configuración</button>
+                    <button className="udrop-item danger" onClick={()=>{setUser(null);setShowDrop(false);}}>🚪 Cerrar sesión</button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="layout">
+        <Sidebar filters={filters} setFilters={setFilters} counts={sCounts}/>
+        <main className="main-area">
+          <div className="search-bar">
+            <div className="sw">
+              <span className="sico">🔍</span>
+              <input className="sinput" placeholder="Buscar por nombre o especie…"
+                value={filters.search} onChange={e=>setFilters(f=>({...f,search:e.target.value}))}/>
+            </div>
+            <select className="ssel"><option>Más recientes</option><option>Nombre A-Z</option><option>Edad ↑</option></select>
+          </div>
+          <div className="rm">
+            <span className="rc">{filtering?"Filtrando…":<><strong>{filtered.length}</strong> animales encontrados</>}</span>
+            <div className="vt">
+              <button className={`vb ${view==="grid"?"active":""}`} onClick={()=>setView("grid")}>⊞</button>
+              <button className={`vb ${view==="list"?"active":""}`} onClick={()=>setView("list")}>☰</button>
+            </div>
+          </div>
+          {filtering ? (
+            <div className="lw"><div className="spinner"/><span style={{fontSize:13,color:"var(--n400)"}}>Aplicando filtros…</span></div>
+          ) : paged.length===0 ? (
+            <div className="ew"><div className="ei">🔎</div>
+              <div style={{fontSize:15}}>Sin resultados.{" "}
+                <button style={{border:"none",background:"none",color:"var(--g600)",fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",fontSize:14}}
+                  onClick={()=>setFilters({species:"Todos",size:"Todos",age:0,status:"all",search:""})}>Limpiar filtros →</button>
+              </div>
+            </div>
+          ) : (
+            <div className={view==="grid"?"cg":"cl"}>
+              {paged.map(a=><Card key={a.id} a={a} view={view} onClick={setAModal}/>)}
+            </div>
+          )}
+          {!filtering && filtered.length>PER && (
+            <div className="pg">
+              <button className="pb" onClick={()=>setPage(p=>p-1)} disabled={page===1}>‹</button>
+              {Array.from({length:Math.ceil(filtered.length/PER)},(_,i)=>i+1).map(p=>(
+                <button key={p} className={`pb ${p===page?"active":""}`} onClick={()=>setPage(p)}>{p}</button>
+              ))}
+              <button className="pb" onClick={()=>setPage(p=>p+1)} disabled={page===Math.ceil(filtered.length/PER)}>›</button>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {aModal && !fModal && !confirm && <AnimalModal a={aModal} onClose={()=>setAModal(null)} onAdopt={onAdopt}/>}
+      {fModal && !confirm          && <FormModal a={fModal} onClose={()=>setFModal(null)} onSuccess={onSuccess}/>}
+      {confirm                     && <ConfirmModal rec={confirm} onClose={onConfirmClose}/>}
+      {showDB                      && <SolicitudesPanel onClose={()=>setShowDB(false)} tick={tick}/>}
+      {showLogin                   && <LoginModal onClose={()=>setShowLogin(false)} onLogin={handleFakeLogin}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
